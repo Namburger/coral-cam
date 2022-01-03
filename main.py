@@ -1,4 +1,3 @@
-import logging
 import os
 import sys
 from tkinter import Tk, messagebox
@@ -18,7 +17,8 @@ def show_error(title, msg):
 def gen_frame(camera):
     while True:
         frame = camera.get_frame()
-        yield frame
+        if frame is not None:
+            yield frame
 
 
 @eel.expose
@@ -31,17 +31,14 @@ def video_feed():
         eel.updateImageSrc(blob)()
 
 
+# Start the server
 def start_app():
-    # Start the server
     try:
-        eel.init(os.path.dirname(os.path.abspath(__file__)))
-        logging.info("App Started")
+        curr_path = os.path.dirname(os.path.abspath(__file__))
+        eel.init(os.path.join(curr_path, 'web'))
         eel.start('index.html', size=(1280, 770))
     except Exception as e:
-        err_msg = 'Could not launch a local server'
-        logging.error('{}\n{}'.format(err_msg, e.args))
-        show_error(title='Failed to initialise server', msg=err_msg)
-        logging.info('Closing App')
+        show_error(title='Failed to initialise server', msg=f'Could not launch a local server, reason: {e}')
         sys.exit()
 
 

@@ -50,3 +50,8 @@ function inferenceSelectionChanged(elt) {
         addOptions(modelSelector, ['PoseNet MobileNet V1', 'MoveNet.SinglePose.Lightning', 'MoveNet.SinglePose.Thunder', 'PoseNet ResNet-50']);
     }
 }
+
+function onSubmitButtonClicked() {
+    const inferenceType = document.getElementById('inference-type-selector').value;
+    const model = document.getElementById('model-selector').value;
+}

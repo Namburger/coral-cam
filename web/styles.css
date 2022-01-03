@@ -26,7 +26,7 @@ body {
     padding-right: 10px;
 }
 
-.bar1, .bar2, .bar3 {
+.setting-button-bar-top, .setting-button-bar-middle, .setting-button-bar-bottom {
     width: 35px;
     height: 5px;
     background-color: #333;
@@ -35,15 +35,15 @@ body {
 }
 
 
-.change .bar1 {
+.change .setting-button-bar-top {
     transform: rotate(-45deg) translate(-9px, 6px);
 }
 
-.change .bar2 {
+.change .setting-button-bar-middle {
     opacity: 0;
 }
 
-.change .bar3 {
+.change .setting-button-bar-bottom {
     transform: rotate(45deg) translate(-8px, -8px);
 }
 
@@ -58,8 +58,7 @@ body {
     width: 1280px;
     height: 80px;
     background: #fdfdfe;
-    border-top: 1px solid #969696;
-    border-bottom: 1px solid #969696;
+    border-top: 1px solid #fd5e4d;
 }
 
 #inference-submit-button {
@@ -68,10 +67,5 @@ body {
     width: 75px;
     background: #fd5e4d;
     text-align: center;
-    color: #ffffff;
-}
-
-#inference-submit-button:hover {
-    background: #fd854a;
     color: #ffffff;
 }
