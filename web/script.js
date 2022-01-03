@@ -14,8 +14,11 @@ function toggleSettingMenu(elt) {
     settingMenuShow = !settingMenuShow;
 }
 
-function pyVideo() {
+function onStart() {
+    // Starts Video Feed.
     eel.video_feed()()
+    // Set Inference Engine
+    setInferenceEngine()
 }
 
 
@@ -41,7 +44,7 @@ function addOptions(selector, options) {
 
 function inferenceSelectionChanged(elt) {
     let modelSelector = document.getElementById('model-selector');
-    modelSelector.innerHTML = '';
+    modelSelector.innerHTML = ''; // Clears all current model options
     if (elt.value === 'classification') {
         addOptions(modelSelector, ['MobileNet V1', 'MobileNet V2', 'MobileNet V3', 'Inception V1', 'Inception V3', 'ResNet-50', 'EfficientNet']);
     } else if (elt.value === 'detection') {
@@ -51,7 +54,8 @@ function inferenceSelectionChanged(elt) {
     }
 }
 
-function onSubmitButtonClicked() {
+function setInferenceEngine() {
     const inferenceType = document.getElementById('inference-type-selector').value;
     const model = document.getElementById('model-selector').value;
+    eel.set_engine(inferenceType, model)
 }

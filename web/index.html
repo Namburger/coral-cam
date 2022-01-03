@@ -7,7 +7,7 @@
     <script type="text/javascript" src="script.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body onload="pyVideo()">
+<body onload="onStart()">
 <div class="main-container">
     <div class="coral-cam-title-container">
         <label class="coral-cam-title">Coral Cam</label>
@@ -30,15 +30,15 @@
                 <label for="model-selector">Model:</label>
                 <select id="model-selector">
                     <option selected>MobileNet V1</option>
-                    <option selected>MobileNet V2</option>
-                    <option selected>MobileNet V3</option>
-                    <option selected>Inception V1</option>
-                    <option selected>Inception V3</option>
-                    <option selected>ResNet-50</option>
-                    <option selected>EfficientNet</option>
+                    <option>MobileNet V2</option>
+                    <option>MobileNet V3</option>
+                    <option>Inception V1</option>
+                    <option>Inception V3</option>
+                    <option>ResNet-50</option>
+                    <option>EfficientNet</option>
                 </select>
             </div>
-            <button id="inference-submit-button" onclick="onSubmitButtonClicked()">submit</button>
+            <button id="inference-submit-button" onclick="setInferenceEngine()">submit</button>
         </div>
         <img id="coral-cam-video-feed" src="coral.jpg">
     </div>

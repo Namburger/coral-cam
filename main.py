@@ -3,7 +3,10 @@ import sys
 from tkinter import Tk, messagebox
 import eel
 import base64
-from camera import VideoCamera
+from camera import CoralCam
+
+# Coral Cam is a global singleton
+camera = CoralCam()
 
 
 @eel.expose
@@ -14,25 +17,23 @@ def show_error(title, msg):
     root.destroy()
 
 
-def gen_frame(camera):
+@eel.expose
+def video_feed():
     while True:
         frame = camera.get_frame()
         if frame is not None:
-            yield frame
+            # Convert bytes to base64 encoded str, as we can only pass json to frontend
+            blob = base64.b64encode(frame).decode('utf-8')
+            eel.updateImageSrc(blob)()
 
 
 @eel.expose
-def video_feed():
-    camera = VideoCamera()
-    for frame in gen_frame(camera):
-        # Convert bytes to base64 encoded str, as we can only pass json to frontend
-        blob = base64.b64encode(frame)
-        blob = blob.decode("utf-8")
-        eel.updateImageSrc(blob)()
+def set_engine(inference_type, model):
+    camera.set_engine(inference_type, model)
 
 
-# Start the server
-def start_app():
+if __name__ == "__main__":
+    print('Starting')
     try:
         curr_path = os.path.dirname(os.path.abspath(__file__))
         eel.init(os.path.join(curr_path, 'web'))
@@ -40,7 +41,3 @@ def start_app():
     except Exception as e:
         show_error(title='Failed to initialise server', msg=f'Could not launch a local server, reason: {e}')
         sys.exit()
-
-
-if __name__ == "__main__":
-    start_app()
