@@ -15,10 +15,10 @@ function toggleSettingMenu(elt) {
 }
 
 function onStart() {
-    // Starts Video Feed.
-    eel.video_feed()()
     // Set Inference Engine
     setInferenceEngine()
+    // Starts Video Feed.
+    eel.video_feed()()
 }
 
 
