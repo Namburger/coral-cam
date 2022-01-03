@@ -78,10 +78,10 @@ class InferenceAdaptor:
                 label = '%s: %d%%' % (ModelUtils.get_detection_class(int(classes[i])), int(scores[i] * 100))
                 label_size, base_line = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
                 # Make sure not to draw label too close to top of window.
-                label_location = max(y_min, label_size[1] + 10)
-                cv2.rectangle(image, (x_min, label_location - label_size[1] - 10), (
-                    x_min + label_size[0], label_location + base_line - 10), InferenceAdaptor.coral_bgr, cv2.FILLED)
-                cv2.putText(image, label, (x_min, label_location - 7),
+                label_y = max(y_min, label_size[1] + 10)
+                cv2.rectangle(image, (x_min, label_y - label_size[1] - 10), (
+                    x_min + label_size[0], label_y + base_line - 10), InferenceAdaptor.coral_bgr, cv2.FILLED)
+                cv2.putText(image, label, (x_min, label_y - 7),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
         return image
 
@@ -102,6 +102,8 @@ class CoralCam(object):
         CoralCam.__instance.video.set(cv2.CAP_PROP_FRAME_WIDTH, CoralCam.__instance.width)
         CoralCam.__instance.height = 720
         CoralCam.__instance.video.set(cv2.CAP_PROP_FRAME_HEIGHT, CoralCam.__instance.height)
+        CoralCam.__instance.current_model = None  # Stores current model path.
+        CoralCam.__instance.current_model_size = None  # Stores current model size as a string.
         CoralCam.__instance.inference_type = None  # [classification, detection, pose-estimation]
         CoralCam.__instance.engine = None  # Inference Engine
         return CoralCam.__instance
@@ -110,12 +112,30 @@ class CoralCam(object):
         self.video.release()
 
     def set_engine(self, inference_type, model):
-        print(f'<--- Switching --->\n - inference type: {inference_type}\n - model: {model}')
+        self.__instance.current_model = ModelUtils.get_model_path(model)
+        print(f'Mode: {inference_type}'
+              f'\n - model name: {model}'
+              f'\n - model path: {self.__instance.current_model}')
         self.__instance.inference_type = inference_type
         self.__instance.engine = Interpreter(
-            ModelUtils.get_model_path(model),
+            self.__instance.current_model,
             experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
         self.__instance.engine.allocate_tensors()
+        input_details = self.__instance.engine.get_input_details()
+        width = input_details[0]['shape'][2]
+        height = input_details[0]['shape'][1]
+        self.__instance.current_model_size = f'{width}x{height}'
+
+    def add_model_info(self, image):
+        model_name = str(self.__instance.current_model).split('/')[-1]
+        model_name_size, _ = cv2.getTextSize(model_name, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+        model_name_y = model_name_size[1] + 5
+        cv2.putText(image, model_name, (10, model_name_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                    InferenceAdaptor.coral_bgr, 1)
+        model_size, _ = cv2.getTextSize(self.__instance.current_model_size, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+        model_size_y = model_name_y + model_size[1] + 5
+        cv2.putText(image, self.__instance.current_model_size, (10, model_size_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                    InferenceAdaptor.coral_bgr, 1)
 
     def get_frame(self):
         success, image = self.video.read()
@@ -131,6 +151,7 @@ class CoralCam(object):
             else:  # pose-estimation
                 image = InferenceAdaptor.pose_estimate(CoralCam.__instance.engine, image, CoralCam.__instance.width,
                                                        CoralCam.__instance.height)
+            self.add_model_info(image)
             ret, jpeg = cv2.imencode('.jpg', image)
             if ret:
                 return jpeg.tobytes()
