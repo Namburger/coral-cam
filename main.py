@@ -7,6 +7,7 @@ import base64
 from camera import VideoCamera
 
 
+@eel.expose
 def show_error(title, msg):
     root = Tk()
     root.withdraw()  # hide main window
@@ -28,11 +29,6 @@ def video_feed():
         blob = base64.b64encode(frame)
         blob = blob.decode("utf-8")
         eel.updateImageSrc(blob)()
-
-
-@eel.expose
-def print_hello():
-    print('Hello')
 
 
 def start_app():
