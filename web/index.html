@@ -22,20 +22,16 @@
             <div style="margin-top: 5px"></div>
             <label for="inference-type-selector" style="padding-left: 10px">Inference Type:</label>
             <select name="inference-selector" id="inference-type-selector" onchange="inferenceSelectionChanged(this)">
-                <option value="classification" selected>Classification</option>
-                <option value="detection">Detection</option>
+                <option value="detection" selected>Detection</option>
+                <option value="classification">Classification</option>
                 <option value="pose-estimation">Pose Estimation</option>
             </select>
             <div id="model-type-container" style="margin: 5px 0 5px 0; padding-left: 10px">
                 <label for="model-selector">Model:</label>
                 <select id="model-selector">
-                    <option selected>MobileNet V1</option>
-                    <option>MobileNet V2</option>
-                    <option>MobileNet V3</option>
-                    <option>Inception V1</option>
-                    <option>Inception V3</option>
-                    <option>ResNet-50</option>
-                    <option>EfficientNet</option>
+                    <option selected>SSDLite MobileDet</option>
+                    <option>SSD MobileNet V1</option>
+                    <option>SSD MobileNet V2</option>
                 </select>
             </div>
             <button id="inference-submit-button" onclick="setInferenceEngine()">submit</button>

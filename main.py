@@ -33,7 +33,7 @@ def set_engine(inference_type, model):
 
 
 if __name__ == "__main__":
-    print('Starting')
+    print('Starting CoralCam...')
     try:
         curr_path = os.path.dirname(os.path.abspath(__file__))
         eel.init(os.path.join(curr_path, 'web'))

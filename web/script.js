@@ -46,11 +46,13 @@ function inferenceSelectionChanged(elt) {
     let modelSelector = document.getElementById('model-selector');
     modelSelector.innerHTML = ''; // Clears all current model options
     if (elt.value === 'classification') {
-        addOptions(modelSelector, ['MobileNet V1', 'MobileNet V2', 'MobileNet V3', 'Inception V1', 'Inception V3', 'ResNet-50', 'EfficientNet']);
+        addOptions(modelSelector, ['MobileNet V1', 'MobileNet V2', 'Inception V1', 'Inception V2',
+            'Inception V3', 'Inception V4', 'ResNet-50', 'EfficientNet (S)', 'EfficientNet (M)', 'EfficientNet (L)']);
     } else if (elt.value === 'detection') {
         addOptions(modelSelector, ['SSD MobileNet V1', 'SSD MobileNet V2', 'SSDLite MobileDet']);
     } else { // pose-estimation
-        addOptions(modelSelector, ['PoseNet MobileNet V1', 'MoveNet.SinglePose.Lightning', 'MoveNet.SinglePose.Thunder', 'PoseNet ResNet-50']);
+        addOptions(modelSelector, ['PoseNet MobileNet V1', 'MoveNet.SinglePose.Lightning',
+            'MoveNet.SinglePose.Thunder']);
     }
 }
 

@@ -5,10 +5,14 @@ import numpy as np
 from tflite_runtime.interpreter import Interpreter
 from tflite_runtime.interpreter import load_delegate
 
+from model_utils import ModelUtils
+
 
 class InferenceAdaptor:
+    coral_bgr = (77, 94, 253)
+
     @staticmethod
-    def detection(interpreter, image, image_width, image_height):
+    def classify(interpreter, image):
         input_details = interpreter.get_input_details()
         width = input_details[0]['shape'][2]
         height = input_details[0]['shape'][1]
@@ -16,6 +20,43 @@ class InferenceAdaptor:
         resized = cv2.resize(rgb, (width, height))
         input_data = np.expand_dims(resized, axis=0)
 
+        # Set input and run inference.
+        interpreter.set_tensor(input_details[0]['index'], input_data)
+        interpreter.invoke()
+
+        # Get output. 
+        output_details = interpreter.get_output_details()[0]
+        output = np.squeeze(interpreter.get_tensor(output_details['index']))
+        # If the model is quantized (uint8 data), then dequantize the results
+        if output_details['dtype'] == np.uint8:
+            scale, zero_point = output_details['quantization']
+            output = scale * (output - zero_point)
+        max_idx = np.argmax(output)
+        score = output[max_idx]
+        class_label = f'class: {ModelUtils.get_classification_class(max_idx)}'
+        label_size, _ = cv2.getTextSize(class_label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+        label_x_location = 1280 - ((label_size[0]) + 30)
+        label_y_location = label_size[1] + 5
+        cv2.putText(image, class_label, (label_x_location, label_y_location), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+                    InferenceAdaptor.coral_bgr, 2)
+        score_label = f'score: {score}'
+        score_size, _ = cv2.getTextSize(score_label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+        score_x_location = label_x_location
+        score_y_location = label_y_location + score_size[1] + 5
+        cv2.putText(image, score_label, (score_x_location, score_y_location), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+                    InferenceAdaptor.coral_bgr, 2)
+        return image
+
+    @staticmethod
+    def detect(interpreter, image, image_width, image_height):
+        input_details = interpreter.get_input_details()
+        width = input_details[0]['shape'][2]
+        height = input_details[0]['shape'][1]
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        resized = cv2.resize(rgb, (width, height))
+        input_data = np.expand_dims(resized, axis=0)
+
+        # Set input and run inference.
         interpreter.set_tensor(input_details[0]['index'], input_data)
         interpreter.invoke()
 
@@ -33,16 +74,19 @@ class InferenceAdaptor:
                 x_min = int(max(1, (boxes[i][1] * image_width)))
                 y_max = int(min(image_height, (boxes[i][2] * image_height)))
                 x_max = int(min(image_width, (boxes[i][3] * image_width)))
-                cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (10, 255, 0), 4)
-                label = '%s: %d%%' % (classes[i], int(scores[i] * 100))
-                label_size, base_line = cv2.getTextSize(
-                    label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
-                # Make sure not to draw label too close to top of window
+                cv2.rectangle(image, (x_min, y_min), (x_max, y_max), InferenceAdaptor.coral_bgr, 4)
+                label = '%s: %d%%' % (ModelUtils.get_detection_class(int(classes[i])), int(scores[i] * 100))
+                label_size, base_line = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
+                # Make sure not to draw label too close to top of window.
                 label_location = max(y_min, label_size[1] + 10)
                 cv2.rectangle(image, (x_min, label_location - label_size[1] - 10), (
-                    x_min + label_size[0], label_location + base_line - 10), (255, 255, 255), cv2.FILLED)
+                    x_min + label_size[0], label_location + base_line - 10), InferenceAdaptor.coral_bgr, cv2.FILLED)
                 cv2.putText(image, label, (x_min, label_location - 7),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+        return image
+
+    @staticmethod
+    def pose_estimate(interpreter, image, image_width, image_height):
         return image
 
 
@@ -66,13 +110,12 @@ class CoralCam(object):
         self.video.release()
 
     def set_engine(self, inference_type, model):
-        print(f'Switching\n - inference type: {inference_type}\n - model: {model}')
+        print(f'<--- Switching --->\n - inference type: {inference_type}\n - model: {model}')
         self.__instance.inference_type = inference_type
         self.__instance.engine = Interpreter(
-            os.path.join('test_data', 'ssdlite_mobiledet_coco_qat_postprocess_edgetpu.tflite'),
+            ModelUtils.get_model_path(model),
             experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
         self.__instance.engine.allocate_tensors()
-        # self.__instance.engine = Interpreter(model, experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
 
     def get_frame(self):
         success, image = self.video.read()
@@ -80,8 +123,14 @@ class CoralCam(object):
         # so we must encode it into JPEG in order to correctly display the
         # video stream.
         if success:
-            image = InferenceAdaptor.detection(CoralCam.__instance.engine, image, CoralCam.__instance.width,
-                                               CoralCam.__instance.height)
+            if self.__instance.inference_type == 'classification':
+                image = InferenceAdaptor.classify(CoralCam.__instance.engine, image)
+            elif self.__instance.inference_type == 'detection':
+                image = InferenceAdaptor.detect(CoralCam.__instance.engine, image, CoralCam.__instance.width,
+                                                CoralCam.__instance.height)
+            else:  # pose-estimation
+                image = InferenceAdaptor.pose_estimate(CoralCam.__instance.engine, image, CoralCam.__instance.width,
+                                                       CoralCam.__instance.height)
             ret, jpeg = cv2.imencode('.jpg', image)
             if ret:
                 return jpeg.tobytes()
