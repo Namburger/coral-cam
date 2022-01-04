@@ -168,27 +168,34 @@ class CoralCam(object):
         self.video.release()
 
     def set_engine(self, inference_type, model, edgetpu):
-        self.__instance.current_model = ModelUtils.get_model_path(model, edgetpu)
-        print(f'Mode: {inference_type}'
-              f'\n - model name: {model}'
-              f'\n - model path: {self.__instance.current_model}')
-        self.__instance.inference_type = inference_type
-        if 'edgetpu' in self.__instance.current_model:
-            if 'posenet' in self.__instance.current_model:
-                self.__instance.engine = Interpreter(
-                    self.__instance.current_model,
-                    experimental_delegates=[load_delegate(EDGETPU_SHARED_LIB), load_delegate(POSENET_SHARED_LIB)])
-            else:
-                self.__instance.engine = Interpreter(
-                    self.__instance.current_model,
-                    experimental_delegates=[load_delegate(EDGETPU_SHARED_LIB)])
+        current_model = ModelUtils.get_model_path(model, edgetpu)
+        if 'edgetpu' in current_model:
+            try:
+                if 'posenet' in current_model:
+                    self.__instance.engine = Interpreter(
+                        current_model,
+                        experimental_delegates=[load_delegate(EDGETPU_SHARED_LIB), load_delegate(POSENET_SHARED_LIB)])
+                else:
+                    self.__instance.engine = Interpreter(
+                        current_model,
+                        experimental_delegates=[load_delegate(EDGETPU_SHARED_LIB)])
+            except Exception as e:
+                print(f'Failed to switch to edgetpu model, reason: {e}')
+                return
         else:
-            if 'posenet' in self.__instance.current_model:
-                self.__instance.engine = Interpreter(self.__instance.current_model,
+            if 'posenet' in current_model:
+                self.__instance.engine = Interpreter(current_model,
                                                      experimental_delegates=[load_delegate(POSENET_SHARED_LIB)])
             else:
-                self.__instance.engine = Interpreter(self.__instance.current_model)
+                self.__instance.engine = Interpreter(current_model)
 
+        self.__instance.current_model = ModelUtils.get_model_path(model, edgetpu)
+        self.__instance.inference_type = inference_type
+        print(f'Mode: {self.__instance.inference_type}'
+              f'\n - model name: {model}'
+              f'\n - model path: {self.__instance.current_model}')
+
+        # Initialize new model.
         self.__instance.engine.allocate_tensors()
         input_details = self.__instance.engine.get_input_details()
         width = input_details[0]['shape'][2]
