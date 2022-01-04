@@ -1,5 +1,5 @@
 let windowWidth = 1280;
-let windowHeight = 770;
+let windowHeight = 900;
 
 window.addEventListener("resize", function () {
     window.resizeTo(windowWidth, windowHeight);
@@ -11,11 +11,11 @@ function toggleSettingMenu(elt) {
     elt.classList.toggle('change');
     if (settingMenuShow) {
         document.getElementById('setting-menu').style.display = '';
-        windowHeight = 870;
+        windowHeight = 1000;
         window.resizeTo(windowWidth, windowHeight);
     } else {
         document.getElementById('setting-menu').style.display = 'none';
-        windowHeight = 770;
+        windowHeight = 900;
         window.resizeTo(windowWidth, windowHeight);
     }
     settingMenuShow = !settingMenuShow;
@@ -34,6 +34,15 @@ eel.expose(updateImageSrc);
 function updateImageSrc(img) {
     let elem = document.getElementById('coral-cam-video-feed');
     elem.src = "data:image/jpeg;base64," + img;
+}
+
+eel.expose(updateLog);
+
+function updateLog(msg) {
+    let elt = document.getElementById('log-console');
+    const date = new Date(Date.now());
+    const timedMsg = date.toUTCString() + ': ' + msg;
+    elt.value += '\n' + timedMsg;
 }
 
 function addOption(selector, optionName) {

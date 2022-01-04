@@ -134,3 +134,13 @@ input:checked + .slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+
+#log-console {
+    border: 2px solid #fd5e4d;
+    margin: 0 5px 0 5px;
+    background-color: #000000;
+    height: 100px;
+    width: 1264px;
+    resize: none;
+    color: #fd5e4d;
+}

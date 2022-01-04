@@ -33,11 +33,10 @@ def set_engine(inference_type, model, edgetpu):
 
 
 if __name__ == "__main__":
-    print('Starting CoralCam...')
     try:
         curr_path = os.path.dirname(os.path.abspath(__file__))
         eel.init(os.path.join(curr_path, 'web'))
-        eel.start('index.html', size=(1280, 770))
+        eel.start('index.html', size=(1280, 900))
     except Exception as e:
         show_error(title='Failed to initialise server', msg=f'Could not launch a local server, reason: {e}')
         sys.exit()

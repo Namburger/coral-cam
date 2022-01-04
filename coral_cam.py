@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import cv2
+import eel
 from time import time
 from PIL import Image
 from tflite_runtime.interpreter import Interpreter
@@ -180,7 +181,8 @@ class CoralCam(object):
                         current_model,
                         experimental_delegates=[load_delegate(EDGETPU_SHARED_LIB)])
             except Exception as e:
-                print(f'Failed to switch to edgetpu model, reason: {e}')
+                msg = f'Failed to switch to edgetpu model, reason: {e}'
+                eel.updateLog(msg)()
                 return
         else:
             if 'posenet' in current_model:
@@ -191,9 +193,6 @@ class CoralCam(object):
 
         self.__instance.current_model = ModelUtils.get_model_path(model, edgetpu)
         self.__instance.inference_type = inference_type
-        print(f'Mode: {self.__instance.inference_type}'
-              f'\n - model name: {model}'
-              f'\n - model path: {self.__instance.current_model}')
 
         # Initialize new model.
         self.__instance.engine.allocate_tensors()
@@ -201,6 +200,9 @@ class CoralCam(object):
         width = input_details[0]['shape'][2]
         height = input_details[0]['shape'][1]
         self.__instance.current_model_size = f'{width}x{height}'
+        
+        msg = f'Mode: {self.__instance.inference_type} - model name: {model} - model path: {self.__instance.current_model} '
+        eel.updateLog(msg)()
 
     def add_model_info(self, image):
         model_name = f'model: {str(self.__instance.current_model).split("/")[-1]}'
