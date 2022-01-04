@@ -6,7 +6,7 @@ import base64
 from coral_cam import CoralCam
 
 # Coral Cam is a global singleton
-camera = CoralCam()
+coral_cam = CoralCam()
 
 
 @eel.expose
@@ -20,7 +20,7 @@ def show_error(title, msg):
 @eel.expose
 def video_feed():
     while True:
-        frame = camera.get_frame()
+        frame = coral_cam.get_frame()
         if frame is not None:
             # Convert bytes to base64 encoded str, as we can only pass json to frontend
             blob = base64.b64encode(frame).decode('utf-8')
@@ -29,7 +29,7 @@ def video_feed():
 
 @eel.expose
 def set_engine(inference_type, model, edgetpu):
-    camera.set_engine(inference_type, model, edgetpu)
+    coral_cam.set_engine(inference_type, model, edgetpu)
 
 
 if __name__ == "__main__":
