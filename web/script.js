@@ -46,13 +46,32 @@ function inferenceSelectionChanged(elt) {
     let modelSelector = document.getElementById('model-selector');
     modelSelector.innerHTML = ''; // Clears all current model options
     if (elt.value === 'classification') {
-        addOptions(modelSelector, ['MobileNet V1', 'MobileNet V2', 'Inception V1', 'Inception V2',
-            'Inception V3', 'Inception V4', 'ResNet-50', 'EfficientNet (S)', 'EfficientNet (M)', 'EfficientNet (L)']);
+        addOptions(modelSelector, [
+            'MobileNet V1',
+            'MobileNet V2',
+            'Inception V1',
+            'Inception V2',
+            'Inception V3',
+            'Inception V4',
+            'ResNet-50',
+            'EfficientNet (S)',
+            'EfficientNet (M)',
+            'EfficientNet (L)']);
     } else if (elt.value === 'detection') {
-        addOptions(modelSelector, ['SSD MobileNet V1', 'SSD MobileNet V2', 'SSDLite MobileDet',
-            'EfficientDet-Lite0', 'EfficientDet-Lite1', 'EfficientDet-Lite2', 'EfficientDet-Lite3']);
+        addOptions(modelSelector, [
+            'SSD MobileNet V1',
+            'SSD MobileNet V2',
+            'SSDLite MobileDet',
+            'EfficientDet-Lite0',
+            'EfficientDet-Lite1',
+            'EfficientDet-Lite2',
+            'EfficientDet-Lite3']);
     } else { // pose-estimation
-        addOptions(modelSelector, ['PoseNet MobileNet V1', 'MoveNet.SinglePose.Lightning',
+        addOptions(modelSelector, [
+            'PoseNet MobileNet V1 (S)',
+            'PoseNet MobileNet V1 (M)',
+            'PoseNet MobileNet V1 (L)',
+            'MoveNet.SinglePose.Lightning',
             'MoveNet.SinglePose.Thunder']);
     }
 }
