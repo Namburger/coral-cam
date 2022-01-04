@@ -56,16 +56,81 @@ body {
 
 .setting-menu {
     width: 1280px;
-    height: 80px;
+    height: 100px;
     background: #fdfdfe;
     border-top: 1px solid #fd5e4d;
 }
 
 #inference-submit-button {
     margin-left: 10px;
-    height: 20px;
+    margin-top: 5px;
+    height: 22px;
     width: 75px;
     background: #fd5e4d;
     text-align: center;
     color: #ffffff;
+}
+
+#inference-submit-button:hover {
+    background: #fd854a !important;
+}
+
+.edgetpu-switch {
+    margin-left: 10px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 17px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 4px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #fd5e4d;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #fd5e4d;
+}
+
+input:checked + .slider:before {
+    transform: translateX(12px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
 }

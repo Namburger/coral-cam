@@ -53,8 +53,11 @@ class ModelUtils:
     classification_label = read_classification_label()
 
     @staticmethod
-    def get_model_path(model_name):
-        return ModelUtils.model_name_to_path[model_name]
+    def get_model_path(model_name, edgetpu=True):
+        if edgetpu:
+            return ModelUtils.model_name_to_path[model_name]
+        else:
+            return ModelUtils.model_name_to_path[model_name].replace('_edgetpu', '')
 
     @staticmethod
     def get_detection_class(key):

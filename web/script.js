@@ -80,5 +80,6 @@ function inferenceSelectionChanged(elt) {
 function setInferenceEngine() {
     const inferenceType = document.getElementById('inference-type-selector').value;
     const model = document.getElementById('model-selector').value;
-    eel.set_engine(inferenceType, model)
+    const edgetpu = document.getElementById('edgetpu-slider').checked;
+    eel.set_engine(inferenceType, model, edgetpu)
 }

@@ -28,8 +28,8 @@ def video_feed():
 
 
 @eel.expose
-def set_engine(inference_type, model):
-    camera.set_engine(inference_type, model)
+def set_engine(inference_type, model, edgetpu):
+    camera.set_engine(inference_type, model, edgetpu)
 
 
 if __name__ == "__main__":
