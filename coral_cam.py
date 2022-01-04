@@ -107,7 +107,7 @@ class InferenceAdaptor:
         def get_output_tensor(interpreter_, idx):
             return np.squeeze(interpreter_.tensor(interpreter.get_output_details()[idx]['index'])())
 
-        if 'mobilenet' in model_name:
+        if 'posenet' in model_name:
             keypoints = get_output_tensor(interpreter, 0)
             # keypoints_scores = get_output_tensor(interpreter, 1)
             # pose_scores = get_output_tensor(interpreter, 2)
@@ -155,7 +155,7 @@ class CoralCam(object):
               f'\n - model name: {model}'
               f'\n - model path: {self.__instance.current_model}')
         self.__instance.inference_type = inference_type
-        if inference_type == 'pose-estimation':
+        if 'posenet' in self.__instance.current_model:
             self.__instance.engine = Interpreter(
                 self.__instance.current_model,
                 experimental_delegates=[load_delegate(EDGETPU_SHARED_LIB), load_delegate(POSENET_SHARED_LIB)])
