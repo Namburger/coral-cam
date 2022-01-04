@@ -43,6 +43,7 @@ function updateLog(msg) {
     const date = new Date(Date.now());
     const timedMsg = date.toUTCString() + ': ' + msg;
     elt.value += '\n' + timedMsg;
+    elt.scrollTop = elt.scrollHeight;
 }
 
 function addOption(selector, optionName) {
