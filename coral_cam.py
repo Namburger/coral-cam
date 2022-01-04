@@ -170,7 +170,7 @@ class CoralCam(object):
 
     def set_engine(self, inference_type, model, edgetpu):
         current_model = ModelUtils.get_model_path(model, edgetpu)
-        if 'edgetpu' in current_model:
+        if edgetpu:
             try:
                 if 'posenet' in current_model:
                     self.__instance.engine = Interpreter(
@@ -200,7 +200,7 @@ class CoralCam(object):
         width = input_details[0]['shape'][2]
         height = input_details[0]['shape'][1]
         self.__instance.current_model_size = f'{width}x{height}'
-        
+
         msg = f'Mode: {self.__instance.inference_type} - model name: {model} - model path: {self.__instance.current_model} '
         eel.updateLog(msg)()
 
