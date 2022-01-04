@@ -53,4 +53,4 @@ $ python3 main.py
 Here you can see the magic of Coral Cam. Observe how one can easily switch between different inference types, models, as
 well as how inference latency increases when the edgetpu is not in use:
 
-<img src="demo.gif" width="777">
+<img src="demo.gif" width="1000">
