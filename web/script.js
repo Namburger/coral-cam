@@ -1,5 +1,8 @@
+let windowWidth = 1280;
+let windowHeight = 770;
+
 window.addEventListener("resize", function () {
-    window.resizeTo(1280, 770);
+    window.resizeTo(windowWidth, windowHeight);
 });
 
 let settingMenuShow = true;
@@ -8,8 +11,12 @@ function toggleSettingMenu(elt) {
     elt.classList.toggle('change');
     if (settingMenuShow) {
         document.getElementById('setting-menu').style.display = '';
+        windowHeight = 870;
+        window.resizeTo(windowWidth, windowHeight);
     } else {
         document.getElementById('setting-menu').style.display = 'none';
+        windowHeight = 770;
+        window.resizeTo(windowWidth, windowHeight);
     }
     settingMenuShow = !settingMenuShow;
 }
