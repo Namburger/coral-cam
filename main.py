@@ -3,7 +3,7 @@ import sys
 from tkinter import Tk, messagebox
 import eel
 import base64
-from camera import CoralCam
+from coral_cam import CoralCam
 
 # Coral Cam is a global singleton
 camera = CoralCam()
