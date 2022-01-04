@@ -5,18 +5,24 @@ body {
     color: #fd5e4d;
 }
 
+.main-container {
+    width: 1278px;
+    border: 1px solid #53bfc1;
+}
+
 .coral-cam-title-container {
     white-space: nowrap;
     height: 45px;
-    width: 1280px;
-    background: #fdfdfe;
+    width: 1278px;
+    background: #fd5e4d;
+    border-bottom: 1px solid #53bfc1;
 }
 
 .coral-cam-title {
     line-height: 45px;
     font-size: 30px;
     display: inline-block;
-    color: #fd5e4d;
+    color: #f5d0cb;
     padding-left: 10px;
 }
 
@@ -50,16 +56,16 @@ body {
 
 
 #coral-cam-video-feed {
-    width: 1278px;
+    width: 1276px;
     height: 718px;
-    border: 1px solid #fd5e4d;
+    border-top: 1px solid #53bfc1;
 }
 
 .setting-menu {
-    width: 1280px;
+    width: 1276px;
     height: 100px;
-    background: #fdfdfe;
-    border-top: 1px solid #fd5e4d;
+    background: #f5d0cb;
+    border-top: 1px solid #53bfc1;
 }
 
 #inference-submit-button {
@@ -141,7 +147,7 @@ input:checked + .slider:before {
     margin: 0 5px 0 5px;
     background-color: #000000;
     height: 100px;
-    width: 1264px;
+    width: 1262px;
     resize: none;
     color: #fd5e4d;
 }
