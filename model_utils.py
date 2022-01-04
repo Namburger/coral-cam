@@ -39,10 +39,15 @@ class ModelUtils:
         'EfficientDet-Lite1': os.path.join('test_data', 'efficientdet_lite1_384_ptq_edgetpu.tflite'),
         'EfficientDet-Lite2': os.path.join('test_data', 'efficientdet_lite2_448_ptq_edgetpu.tflite'),
         'EfficientDet-Lite3': os.path.join('test_data', 'efficientdet_lite3_512_ptq_edgetpu.tflite'),
-        'PoseNet MobileNet V1': os.path.join('test_data', 'posenet',
-                                             'posenet_mobilenet_v1_075_481_641_16_quant_decoder_edgetpu.tflite'),
+        'PoseNet MobileNet V1 (S)': os.path.join('test_data', 'posenet',
+                                                 'posenet_mobilenet_v1_075_353_481_16_quant_decoder_edgetpu.tflite'),
+        'PoseNet MobileNet V1 (M)': os.path.join('test_data', 'posenet',
+                                                 'posenet_mobilenet_v1_075_481_641_16_quant_decoder_edgetpu.tflite'),
+        'PoseNet MobileNet V1 (L)': os.path.join('test_data', 'posenet',
+                                                 'posenet_mobilenet_v1_075_721_1281_16_quant_decoder_edgetpu.tflite'),
         'MoveNet.SinglePose.Lightning': os.path.join('test_data', 'movenet_single_pose_lightning_ptq_edgetpu.tflite'),
-        'MoveNet.SinglePose.Thunder': os.path.join('test_data', 'movenet_single_pose_thunder_ptq_edgetpu.tflite')}
+        'MoveNet.SinglePose.Thunder': os.path.join('test_data', 'movenet_single_pose_thunder_ptq_edgetpu.tflite')
+    }
 
     detection_label = read_detection_label()
     classification_label = read_classification_label()

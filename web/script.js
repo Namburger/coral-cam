@@ -72,7 +72,8 @@ function inferenceSelectionChanged(elt) {
             'PoseNet MobileNet V1 (M)',
             'PoseNet MobileNet V1 (L)',
             'MoveNet.SinglePose.Lightning',
-            'MoveNet.SinglePose.Thunder']);
+            'MoveNet.SinglePose.Thunder'
+        ]);
     }
 }
 

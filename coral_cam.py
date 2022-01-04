@@ -1,9 +1,14 @@
+import os
 import numpy as np
 import cv2
 from time import time
 from tflite_runtime.interpreter import Interpreter
 from tflite_runtime.interpreter import load_delegate
 from model_utils import ModelUtils
+
+EDGETPU_SHARED_LIB = 'libedgetpu.so.1'
+POSENET_SHARED_LIB = os.path.join(
+    'posenet_lib', os.uname().machine, 'posenet_decoder.so')
 
 
 class InferenceAdaptor:
@@ -16,13 +21,17 @@ class InferenceAdaptor:
                     InferenceAdaptor.coral_bgr, 1)
 
     @staticmethod
-    def classify(interpreter, image):
+    def run_inference(interpreter, image):
         input_details = interpreter.get_input_details()
         width = input_details[0]['shape'][2]
         height = input_details[0]['shape'][1]
         rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         resized = cv2.resize(rgb, (width, height))
-        input_data = np.expand_dims(resized, axis=0)
+        if interpreter.get_input_details()[0]['dtype'] == np.float32:
+            input_data = np.float32(resized) / 128.0 - 1.0
+        else:
+            input_data = np.asarray(resized)
+        input_data = np.expand_dims(input_data, axis=0)
 
         # Set input and run inference.
         t0 = time()
@@ -30,6 +39,12 @@ class InferenceAdaptor:
         interpreter.invoke()
         latency = 'latency: {:.2f} ms'.format((time() - t0) * 1000)
         InferenceAdaptor.update_latency(latency, image)
+        return width, height
+
+    @staticmethod
+    def classify(interpreter, image):
+        # Run Inference on image.
+        InferenceAdaptor.run_inference(interpreter, image)
 
         # Get output. 
         output_details = interpreter.get_output_details()[0]
@@ -56,19 +71,8 @@ class InferenceAdaptor:
 
     @staticmethod
     def detect(interpreter, image, image_width, image_height):
-        input_details = interpreter.get_input_details()
-        width = input_details[0]['shape'][2]
-        height = input_details[0]['shape'][1]
-        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        resized = cv2.resize(rgb, (width, height))
-        input_data = np.expand_dims(resized, axis=0)
-
-        # Set input and run inference.
-        t0 = time()
-        interpreter.set_tensor(input_details[0]['index'], input_data)
-        interpreter.invoke()
-        latency = 'latency: {:.2f} ms'.format((time() - t0) * 1000)
-        InferenceAdaptor.update_latency(latency, image)
+        # Run Inference on image.
+        InferenceAdaptor.run_inference(interpreter, image)
 
         # Get output tensor
         output_details = interpreter.get_output_details()
@@ -96,7 +100,31 @@ class InferenceAdaptor:
         return image
 
     @staticmethod
-    def pose_estimate(interpreter, image, image_width, image_height):
+    def pose_estimate(interpreter, image, model_name, image_width, image_height):
+        # Run Inference on image.
+        model_width, model_height = InferenceAdaptor.run_inference(interpreter, image)
+
+        def get_output_tensor(interpreter_, idx):
+            return np.squeeze(interpreter_.tensor(interpreter.get_output_details()[idx]['index'])())
+
+        if 'mobilenet' in model_name:
+            keypoints = get_output_tensor(interpreter, 0)
+            # keypoints_scores = get_output_tensor(interpreter, 1)
+            # pose_scores = get_output_tensor(interpreter, 2)
+            num_poses = get_output_tensor(interpreter, 3)
+
+            for i in range(int(num_poses)):
+                for keypoint in keypoints[i]:
+                    y, x = keypoint
+                    x, y = int((x / model_width) * image_width), int((y / model_height) * image_height)
+                    image = cv2.circle(image, (x, y), radius=3, color=InferenceAdaptor.coral_bgr, thickness=5)
+        else:
+            keypoints = get_output_tensor(interpreter, 0)
+            for keypoint in keypoints:
+                y, x, score = keypoint
+                if 0.5 < score < 1.0:
+                    x, y = int(x * image_width), int(y * image_height)
+                    image = cv2.circle(image, (x, y), radius=3, color=InferenceAdaptor.coral_bgr, thickness=5)
         return image
 
 
@@ -127,9 +155,14 @@ class CoralCam(object):
               f'\n - model name: {model}'
               f'\n - model path: {self.__instance.current_model}')
         self.__instance.inference_type = inference_type
-        self.__instance.engine = Interpreter(
-            self.__instance.current_model,
-            experimental_delegates=[load_delegate('libedgetpu.so.1.0')])
+        if inference_type == 'pose-estimation':
+            self.__instance.engine = Interpreter(
+                self.__instance.current_model,
+                experimental_delegates=[load_delegate(EDGETPU_SHARED_LIB), load_delegate(POSENET_SHARED_LIB)])
+        else:
+            self.__instance.engine = Interpreter(
+                self.__instance.current_model,
+                experimental_delegates=[load_delegate(EDGETPU_SHARED_LIB)])
         self.__instance.engine.allocate_tensors()
         input_details = self.__instance.engine.get_input_details()
         width = input_details[0]['shape'][2]
@@ -159,7 +192,8 @@ class CoralCam(object):
                 image = InferenceAdaptor.detect(CoralCam.__instance.engine, image, CoralCam.__instance.width,
                                                 CoralCam.__instance.height)
             else:  # pose-estimation
-                image = InferenceAdaptor.pose_estimate(CoralCam.__instance.engine, image, CoralCam.__instance.width,
+                image = InferenceAdaptor.pose_estimate(CoralCam.__instance.engine, image,
+                                                       CoralCam.__instance.current_model, CoralCam.__instance.width,
                                                        CoralCam.__instance.height)
             self.add_model_info(image)
             ret, jpeg = cv2.imencode('.jpg', image)
