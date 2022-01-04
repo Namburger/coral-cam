@@ -17,7 +17,7 @@ class InferenceAdaptor:
     @staticmethod
     def update_latency(latency, image):
         latency_size, _ = cv2.getTextSize(latency, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
-        cv2.putText(image, latency, (10, latency_size[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+        cv2.putText(image, latency, (10, latency_size[1] + 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                     InferenceAdaptor.coral_bgr, 1)
 
     @staticmethod
@@ -170,14 +170,15 @@ class CoralCam(object):
         self.__instance.current_model_size = f'{width}x{height}'
 
     def add_model_info(self, image):
-        model_name = str(self.__instance.current_model).split('/')[-1]
+        model_name = f'model: {str(self.__instance.current_model).split("/")[-1]}'
         model_name_size, _ = cv2.getTextSize(model_name, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
-        model_name_y = model_name_size[1] + 15
+        model_name_y = model_name_size[1] + 20
         cv2.putText(image, model_name, (10, model_name_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                     InferenceAdaptor.coral_bgr, 1)
-        model_size, _ = cv2.getTextSize(self.__instance.current_model_size, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+        size_str = f'size: {self.__instance.current_model_size}'
+        model_size, _ = cv2.getTextSize(size_str, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
         model_size_y = model_name_y + model_size[1] + 5
-        cv2.putText(image, self.__instance.current_model_size, (10, model_size_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+        cv2.putText(image, size_str, (10, model_size_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                     InferenceAdaptor.coral_bgr, 1)
 
     def get_frame(self):
