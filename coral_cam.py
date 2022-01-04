@@ -2,6 +2,7 @@ import os
 import numpy as np
 import cv2
 from time import time
+from PIL import Image
 from tflite_runtime.interpreter import Interpreter
 from tflite_runtime.interpreter import load_delegate
 from model_utils import ModelUtils
@@ -38,13 +39,12 @@ class InferenceAdaptor:
         interpreter.set_tensor(input_details[0]['index'], input_data)
         interpreter.invoke()
         latency = 'latency: {:.2f} ms'.format((time() - t0) * 1000)
-        InferenceAdaptor.update_latency(latency, image)
-        return width, height
+        return width, height, latency
 
     @staticmethod
     def classify(interpreter, image):
         # Run Inference on image.
-        InferenceAdaptor.run_inference(interpreter, image)
+        _, _, latency = InferenceAdaptor.run_inference(interpreter, image)
 
         # Get output. 
         output_details = interpreter.get_output_details()[0]
@@ -67,12 +67,13 @@ class InferenceAdaptor:
         score_y_location = label_y_location + score_size[1] + 5
         cv2.putText(image, score_label, (score_x_location, score_y_location), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
                     InferenceAdaptor.coral_bgr, 2)
+        InferenceAdaptor.update_latency(latency, image)
         return image
 
     @staticmethod
     def detect(interpreter, image, image_width, image_height):
         # Run Inference on image.
-        InferenceAdaptor.run_inference(interpreter, image)
+        _, _, latency = InferenceAdaptor.run_inference(interpreter, image)
 
         # Get output tensor
         output_details = interpreter.get_output_details()
@@ -97,12 +98,13 @@ class InferenceAdaptor:
                     x_min + label_size[0], label_y + base_line - 10), InferenceAdaptor.coral_bgr, cv2.FILLED)
                 cv2.putText(image, label, (x_min, label_y - 7),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+        InferenceAdaptor.update_latency(latency, image)
         return image
 
     @staticmethod
     def pose_estimate(interpreter, image, model_name, image_width, image_height):
         # Run Inference on image.
-        model_width, model_height = InferenceAdaptor.run_inference(interpreter, image)
+        model_width, model_height, latency = InferenceAdaptor.run_inference(interpreter, image)
 
         def get_output_tensor(interpreter_, idx):
             return np.squeeze(interpreter_.tensor(interpreter.get_output_details()[idx]['index'])())
@@ -125,6 +127,22 @@ class InferenceAdaptor:
                 if 0.5 < score < 1.0:
                     x, y = int(x * image_width), int(y * image_height)
                     image = cv2.circle(image, (x, y), radius=3, color=InferenceAdaptor.coral_bgr, thickness=5)
+        InferenceAdaptor.update_latency(latency, image)
+        return image
+
+    @staticmethod
+    def segmentation(interpreter, image, image_width, image_height):
+        # Run Inference on image.
+        _, _, latency = InferenceAdaptor.run_inference(interpreter, image)
+
+        # Get output.
+        output_details = interpreter.get_output_details()[0]
+        output = interpreter.tensor(output_details['index'])()[0].astype(np.uint8)
+        if len(output.shape) == 3:
+            output = np.argmax(output, axis=-1)
+        mask_img = Image.fromarray(ModelUtils.label_to_color_image(output).astype(np.uint8))
+        image = cv2.resize(cv2.cvtColor(np.array(mask_img), cv2.COLOR_RGB2BGR), dsize=(image_width, image_height))
+        InferenceAdaptor.update_latency(latency, image)
         return image
 
 
@@ -200,10 +218,13 @@ class CoralCam(object):
             elif self.__instance.inference_type == 'detection':
                 image = InferenceAdaptor.detect(CoralCam.__instance.engine, image, CoralCam.__instance.width,
                                                 CoralCam.__instance.height)
-            else:  # pose-estimation
+            elif self.__instance.inference_type == 'pose-estimation':
                 image = InferenceAdaptor.pose_estimate(CoralCam.__instance.engine, image,
                                                        CoralCam.__instance.current_model, CoralCam.__instance.width,
                                                        CoralCam.__instance.height)
+            else:
+                image = InferenceAdaptor.segmentation(CoralCam.__instance.engine, image, CoralCam.__instance.width,
+                                                      CoralCam.__instance.height)
             self.add_model_info(image)
             ret, jpeg = cv2.imencode('.jpg', image)
             if ret:

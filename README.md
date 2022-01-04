@@ -6,6 +6,7 @@ Currently, coral cam has the capabilities to deal with 3 problems:
 - Classification
 - Detection
 - Human Pose Estimation
+- Semantic Segmentation
 
 The models that are used in this application are provided [here](https://github.com/google-coral/test_data), more info
 are provided @ [coral/models](https://coral.ai/models).

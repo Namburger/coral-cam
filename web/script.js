@@ -73,7 +73,7 @@ function inferenceSelectionChanged(elt) {
             'EfficientDet-Lite1',
             'EfficientDet-Lite2',
             'EfficientDet-Lite3']);
-    } else { // pose-estimation
+    } else if (elt.value === 'pose-estimation') {
         addOptions(modelSelector, [
             'PoseNet MobileNet V1 (S)',
             'PoseNet MobileNet V1 (M)',
@@ -81,6 +81,12 @@ function inferenceSelectionChanged(elt) {
             'MoveNet.SinglePose.Lightning',
             'MoveNet.SinglePose.Thunder'
         ]);
+    } else { // segmentation.
+        addOptions(modelSelector, [
+            'MobileNet V2 DeepLab V3 (0.5 depth mul)',
+            'MobileNet V2 DeepLab V3 (1.0 depth mul)'
+        ]);
+
     }
 }
 

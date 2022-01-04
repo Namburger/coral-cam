@@ -1,4 +1,5 @@
 import os
+import numpy as np
 
 
 def read_detection_label():
@@ -46,7 +47,11 @@ class ModelUtils:
         'PoseNet MobileNet V1 (L)': os.path.join('test_data', 'posenet',
                                                  'posenet_mobilenet_v1_075_721_1281_16_quant_decoder_edgetpu.tflite'),
         'MoveNet.SinglePose.Lightning': os.path.join('test_data', 'movenet_single_pose_lightning_ptq_edgetpu.tflite'),
-        'MoveNet.SinglePose.Thunder': os.path.join('test_data', 'movenet_single_pose_thunder_ptq_edgetpu.tflite')
+        'MoveNet.SinglePose.Thunder': os.path.join('test_data', 'movenet_single_pose_thunder_ptq_edgetpu.tflite'),
+        'MobileNet V2 DeepLab V3 (0.5 depth mul)': os.path.join('test_data',
+                                                                'deeplabv3_mnv2_dm05_pascal_quant_edgetpu.tflite'),
+        'MobileNet V2 DeepLab V3 (1.0 depth mul)': os.path.join('test_data',
+                                                                'deeplabv3_mnv2_pascal_quant_edgetpu.tflite')
     }
 
     detection_label = read_detection_label()
@@ -66,3 +71,42 @@ class ModelUtils:
     @staticmethod
     def get_classification_class(key):
         return ModelUtils.classification_label[key]
+
+    @staticmethod
+    def create_pascal_label_colormap():
+        """Creates a label colormap used in PASCAL VOC segmentation benchmark.
+        Returns:
+          A Colormap for visualizing segmentation results.
+        """
+        colormap = np.zeros((256, 3), dtype=int)
+        indices = np.arange(256, dtype=int)
+
+        for shift in reversed(range(8)):
+            for channel in range(3):
+                colormap[:, channel] |= ((indices >> channel) & 1) << shift
+            indices >>= 3
+
+        return colormap
+
+    @staticmethod
+    def label_to_color_image(label):
+        """Adds color defined by the dataset colormap to the label.
+        Args:
+          label: A 2D array with integer type, storing the segmentation label.
+        Returns:
+          result: A 2D array with floating type. The element of the array
+            is the color indexed by the corresponding element in the input label
+            to the PASCAL color map.
+        Raises:
+          ValueError: If label is not of rank 2 or its value is larger than color
+            map maximum entry.
+        """
+        if label.ndim != 2:
+            raise ValueError('Expect 2-D input label')
+
+        colormap = ModelUtils.create_pascal_label_colormap()
+
+        if np.max(label) >= len(colormap):
+            raise ValueError('label value too large.')
+
+        return colormap[label]
