@@ -1,15 +1,19 @@
-import cv2
-import os
-
 import numpy as np
+import cv2
+from time import time
 from tflite_runtime.interpreter import Interpreter
 from tflite_runtime.interpreter import load_delegate
-
 from model_utils import ModelUtils
 
 
 class InferenceAdaptor:
     coral_bgr = (77, 94, 253)
+
+    @staticmethod
+    def update_latency(latency, image):
+        latency_size, _ = cv2.getTextSize(latency, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+        cv2.putText(image, latency, (10, latency_size[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                    InferenceAdaptor.coral_bgr, 1)
 
     @staticmethod
     def classify(interpreter, image):
@@ -21,8 +25,11 @@ class InferenceAdaptor:
         input_data = np.expand_dims(resized, axis=0)
 
         # Set input and run inference.
+        t0 = time()
         interpreter.set_tensor(input_details[0]['index'], input_data)
         interpreter.invoke()
+        latency = 'latency: {:.2f} ms'.format((time() - t0) * 1000)
+        InferenceAdaptor.update_latency(latency, image)
 
         # Get output. 
         output_details = interpreter.get_output_details()[0]
@@ -57,8 +64,11 @@ class InferenceAdaptor:
         input_data = np.expand_dims(resized, axis=0)
 
         # Set input and run inference.
+        t0 = time()
         interpreter.set_tensor(input_details[0]['index'], input_data)
         interpreter.invoke()
+        latency = 'latency: {:.2f} ms'.format((time() - t0) * 1000)
+        InferenceAdaptor.update_latency(latency, image)
 
         # Get output tensor
         output_details = interpreter.get_output_details()
@@ -129,7 +139,7 @@ class CoralCam(object):
     def add_model_info(self, image):
         model_name = str(self.__instance.current_model).split('/')[-1]
         model_name_size, _ = cv2.getTextSize(model_name, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
-        model_name_y = model_name_size[1] + 5
+        model_name_y = model_name_size[1] + 15
         cv2.putText(image, model_name, (10, model_name_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                     InferenceAdaptor.coral_bgr, 1)
         model_size, _ = cv2.getTextSize(self.__instance.current_model_size, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
