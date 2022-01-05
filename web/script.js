@@ -1,4 +1,4 @@
-let windowWidth = 1280;
+let windowWidth = 1282;
 let windowHeight = 900;
 
 window.addEventListener("resize", function () {
