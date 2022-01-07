@@ -13,8 +13,8 @@ are provided @ [coral/models](https://coral.ai/models).
 
 Note:
 This application has only been tested with a Debian based Linux machine with
-a  [Coral USB Accelerator](https://coral.ai/products/accelerator) attached. It has not been tested on the Coral Dev
-Board or a machine with any of the Coral PCIe Accelerators.
+a  [Coral USB Accelerator](https://coral.ai/products/accelerator) attached, as well as the original [Coral Dev Board](coral.ai/products/dev-board).
+It has not been tested on the Mini Coral Dev Board or any other platforms.
 
 ## Getting Started
 
@@ -31,7 +31,13 @@ $ python3 -m pip install eel --user
 $ sudo apt install python3-tk python3-pil python3-pil.imaget
 ```
 
-In addition, install:
+On the Dev Board, also install chromium:
+
+```
+$ sudo apt install chromium
+```
+
+In addition, install all tflite/libedgetpu libraries:
 
 - [libedgetpu](https://coral.ai/docs/accelerator/get-started/#1-install-the-edge-tpu-runtime)
 
