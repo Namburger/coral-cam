@@ -1,7 +1,7 @@
 # Coral Cam
 
-Coral Cam is a one-stop shop to protoype, compare, and benchmark state-of-the-art tflite/edgetpu models that deals with images using a live feed.
-Currently, coral cam has the capabilities to deal with 4 problems:
+Coral Cam is a one-stop shop to protoype, compare, and benchmark state-of-the-art tflite/edgetpu models that deals with
+images using a live feed. Currently, coral cam has the capabilities to deal with 4 problems:
 
 - Classification
 - Detection
@@ -11,14 +11,15 @@ Currently, coral cam has the capabilities to deal with 4 problems:
 <img src="demo.gif" width="1000">
 
 Here you can see the magic of Coral Cam. Observe how one can easily switch between different inference types, models, as
-well as how inference latency increases when the edgetpu is not in use.
-The models that are used in this application are provided [here](https://github.com/google-coral/test_data), more info
-are provided @ [coral/models](https://coral.ai/models).
+well as how inference latency increases when the edgetpu is not in use. The models that are used in this application are
+provided [here](https://github.com/google-coral/test_data), more info are provided
+@ [coral/models](https://coral.ai/models).
 
 Note:
 This application has only been tested with a Debian based Linux machine with
-a  [Coral USB Accelerator](https://coral.ai/products/accelerator) attached, as well as the original [Coral Dev Board](coral.ai/products/dev-board).
-It has not been tested on the Mini Coral Dev Board or any other platforms.
+a  [Coral USB Accelerator](https://coral.ai/products/accelerator) attached, as well as the
+original [Coral Dev Board](coral.ai/products/dev-board). It has not been tested on the Mini Coral Dev Board or any other
+platforms.
 
 ## Getting Started
 
@@ -28,7 +29,7 @@ It has not been tested on the Mini Coral Dev Board or any other platforms.
 $ git clone --recurse-submodules https://github.com/Namburger/coral-cam.git
 ```
 
-### Installs Dependencies:
+### Install Dependencies:
 
 ```
 $ python3 -m pip install eel --user

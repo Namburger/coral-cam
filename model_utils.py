@@ -21,6 +21,20 @@ def read_classification_label():
         return [line.strip() for line in f.readlines()]
 
 
+def create_pascal_label_colormap():
+    """Creates a label colormap used in PASCAL VOC segmentation benchmark.
+    Returns:
+      A Colormap for visualizing segmentation results.
+    """
+    colormap = np.zeros((256, 3), dtype=int)
+    indices = np.arange(256, dtype=int)
+    for shift in reversed(range(8)):
+        for channel in range(3):
+            colormap[:, channel] |= ((indices >> channel) & 1) << shift
+        indices >>= 3
+    return colormap
+
+
 class ModelUtils:
     model_name_to_path = {
         'MobileNet V1 (0.5 depth mul. 160x160)': os.path.join('test_data', 'mobilenet_v1_0.5_160_quant_edgetpu.tflite'),
@@ -61,6 +75,7 @@ class ModelUtils:
 
     detection_label = read_detection_label()
     classification_label = read_classification_label()
+    segmentation_pascal_color_map = create_pascal_label_colormap()
 
     @staticmethod
     def get_model_path(model_name, edgetpu=True):
@@ -78,22 +93,6 @@ class ModelUtils:
         return ModelUtils.classification_label[key]
 
     @staticmethod
-    def create_pascal_label_colormap():
-        """Creates a label colormap used in PASCAL VOC segmentation benchmark.
-        Returns:
-          A Colormap for visualizing segmentation results.
-        """
-        colormap = np.zeros((256, 3), dtype=int)
-        indices = np.arange(256, dtype=int)
-
-        for shift in reversed(range(8)):
-            for channel in range(3):
-                colormap[:, channel] |= ((indices >> channel) & 1) << shift
-            indices >>= 3
-
-        return colormap
-
-    @staticmethod
     def label_to_color_image(label):
         """Adds color defined by the dataset colormap to the label.
         Args:
@@ -109,9 +108,7 @@ class ModelUtils:
         if label.ndim != 2:
             raise ValueError('Expect 2-D input label')
 
-        colormap = ModelUtils.create_pascal_label_colormap()
-
-        if np.max(label) >= len(colormap):
+        if np.max(label) >= len(ModelUtils.segmentation_pascal_color_map):
             raise ValueError('label value too large.')
 
-        return colormap[label]
+        return ModelUtils.segmentation_pascal_color_map[label]
