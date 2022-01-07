@@ -3,6 +3,9 @@ import numpy as np
 
 
 def read_detection_label():
+    """ Reads coco label into a map.
+    :return: The Coco label map.
+    """
     coco_label_path = os.path.join('test_data', 'coco_labels.txt')
     with open(coco_label_path, 'r', encoding='utf-8') as f:
         lines = f.readlines()
@@ -16,15 +19,17 @@ def read_detection_label():
 
 
 def read_classification_label():
+    """ Reads imagenet label into a list.
+    :return: The imagenet label map.
+    """
     imagenet_label_path = os.path.join('test_data', 'imagenet_labels.txt')
     with open(imagenet_label_path, 'r') as f:
         return [line.strip() for line in f.readlines()]
 
 
 def create_pascal_label_colormap():
-    """Creates a label colormap used in PASCAL VOC segmentation benchmark.
-    Returns:
-      A Colormap for visualizing segmentation results.
+    """ Creates a label colormap used in PASCAL VOC segmentation benchmark.
+      :return: A Colormap for visualizing segmentation results.
     """
     colormap = np.zeros((256, 3), dtype=int)
     indices = np.arange(256, dtype=int)
@@ -78,32 +83,40 @@ class ModelUtils:
     segmentation_pascal_color_map = create_pascal_label_colormap()
 
     @staticmethod
-    def get_model_path(model_name, edgetpu=True):
+    def get_model_path(model_name: str, edgetpu=True):
+        """ Get the model path to a model name that is selected by the user.
+        :param model_name: The name of the model selected by the user.
+        :param edgetpu: Whether to use the edgetpu or not.
+        :return:
+        """
         if edgetpu:
             return ModelUtils.model_name_to_path[model_name]
         else:
             return ModelUtils.model_name_to_path[model_name].replace('_edgetpu', '')
 
     @staticmethod
-    def get_detection_class(key):
+    def get_detection_class(key: int):
+        """ Gets the name of the detection class that corresponds to key.
+        :param key: The key to coco label map.
+        :return: The name of the class.
+        """
         return ModelUtils.detection_label[key]
 
     @staticmethod
-    def get_classification_class(key):
+    def get_classification_class(key: int):
+        """ Gets the name of the classification class corresponds to key.
+        :param key: The index into the imagemet label map.
+        :return: The name of the class.
+        """
         return ModelUtils.classification_label[key]
 
     @staticmethod
-    def label_to_color_image(label):
+    def label_to_color_image(label: np.array):
         """Adds color defined by the dataset colormap to the label.
-        Args:
-          label: A 2D array with integer type, storing the segmentation label.
-        Returns:
-          result: A 2D array with floating type. The element of the array
-            is the color indexed by the corresponding element in the input label
-            to the PASCAL color map.
-        Raises:
-          ValueError: If label is not of rank 2 or its value is larger than color
-            map maximum entry.
+        :param label: A 2D array with integer type, storing the segmentation label.
+        :return: A 2D array with floating type. The element of the array is the color indexed by the corresponding
+        element in the input label to the PASCAL color map.
+        :except: ValueError: If label is not of rank 2 or its value is larger than color map maximum entry.
         """
         if label.ndim != 2:
             raise ValueError('Expect 2-D input label')

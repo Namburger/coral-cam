@@ -9,8 +9,12 @@ from coral_cam import CoralCam
 coral_cam = CoralCam()
 
 
-@eel.expose
-def show_error(title, msg):
+def show_error(title: str, msg: str):
+    """Opens a tk message box and show a message on it.
+    :param title: The title of the error.
+    :param msg: The actual error message.
+    :return: None
+    """
     root = Tk()
     root.withdraw()  # hide main window
     messagebox.showerror(title, msg)
@@ -19,6 +23,11 @@ def show_error(title, msg):
 
 @eel.expose
 def video_feed():
+    """ The main program loop that gets exposes to javascript and updates coral-cam-video-feed. Internally it calls
+    coral_cam.get_frame() in order to get the frame that's already been preprocessed and then updates it to the image
+    tag.
+    :return: None
+    """
     while True:
         frame = coral_cam.get_frame()
         if frame is not None:
@@ -28,7 +37,13 @@ def video_feed():
 
 
 @eel.expose
-def set_engine(inference_type, model, edgetpu):
+def set_engine(inference_type: str, model: str, edgetpu: bool):
+    """ Switch inference mode, model and toggle the edgetpu on/off when the submit button is clicked.
+    :param inference_type: The type of inference ['classification', 'detection', 'pose-estimation', 'segmentation']
+    :param model: The name of the model that user selected.
+    :param edgetpu: Where to toggle the edgetpu on or off.
+    :return: None
+    """
     coral_cam.set_engine(inference_type, model, edgetpu)
 
 
