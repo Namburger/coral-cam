@@ -36,7 +36,10 @@ if __name__ == "__main__":
     try:
         curr_path = os.path.dirname(os.path.abspath(__file__))
         eel.init(os.path.join(curr_path, 'web'))
-        eel.start('index.html', size=(1282, 900))
+        host = '0.0.0.0'
+        port = 8888
+        print(f'Starting CoralCam @ {host}:{port}')
+        eel.start('index.html', size=(1282, 900), host=host, port=port)
     except Exception as e:
         show_error(title='Failed to initialise server', msg=f'Could not launch a local server, reason: {e}')
         sys.exit()
