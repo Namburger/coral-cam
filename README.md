@@ -1,6 +1,6 @@
 # Coral Cam
 
-Coral Cam is a one-stop shop for protoype, compare, and benchmark state-of-the-art tflite/edgetpu models that deals with images using a live feed.
+Coral Cam is a one-stop shop to protoype, compare, and benchmark state-of-the-art tflite/edgetpu models that deals with images using a live feed.
 Currently, coral cam has the capabilities to deal with 4 problems:
 
 - Classification
