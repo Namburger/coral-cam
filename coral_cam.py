@@ -166,7 +166,7 @@ class CoralCam(object):
         return CoralCam.__instance
 
     def __del__(self):
-        self.video.release()
+        self.__instance.video.release()
 
     def set_engine(self, inference_type, model, edgetpu):
         current_model = ModelUtils.get_model_path(model, edgetpu)
@@ -223,17 +223,17 @@ class CoralCam(object):
         # video stream.
         if success:
             if self.__instance.inference_type == 'classification':
-                image = InferenceAdaptor.classify(CoralCam.__instance.engine, image)
+                image = InferenceAdaptor.classify(self.__instance.engine, image)
             elif self.__instance.inference_type == 'detection':
-                image = InferenceAdaptor.detect(CoralCam.__instance.engine, image, CoralCam.__instance.width,
-                                                CoralCam.__instance.height)
+                image = InferenceAdaptor.detect(self.__instance.engine, image, self.__instance.width,
+                                                self.__instance.height)
             elif self.__instance.inference_type == 'pose-estimation':
-                image = InferenceAdaptor.pose_estimate(CoralCam.__instance.engine, image,
-                                                       CoralCam.__instance.current_model, CoralCam.__instance.width,
-                                                       CoralCam.__instance.height)
+                image = InferenceAdaptor.pose_estimate(self.__instance.engine, image,
+                                                       self.__instance.current_model, self.__instance.width,
+                                                       self.__instance.height)
             else:
-                image = InferenceAdaptor.segmentation(CoralCam.__instance.engine, image, CoralCam.__instance.width,
-                                                      CoralCam.__instance.height)
+                image = InferenceAdaptor.segmentation(self.__instance.engine, image, self.__instance.width,
+                                                      self.__instance.height)
             self.add_model_info(image)
             ret, jpeg = cv2.imencode('.jpg', image)
             if ret:
