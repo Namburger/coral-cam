@@ -1,13 +1,17 @@
 # Coral Cam
 
-Coral Cam is a one-stop shop for comparing/benchmarking state-of-the-art coral edgetpu models that deals with images.
-Currently, coral cam has the capabilities to deal with 3 problems:
+Coral Cam is a one-stop shop to protoype, compare, and benchmark state-of-the-art tflite/edgetpu models that deals with images using a live feed.
+Currently, coral cam has the capabilities to deal with 4 problems:
 
 - Classification
 - Detection
 - Human Pose Estimation
 - Semantic Segmentation
 
+<img src="demo.gif" width="1000">
+
+Here you can see the magic of Coral Cam. Observe how one can easily switch between different inference types, models, as
+well as how inference latency increases when the edgetpu is not in use.
 The models that are used in this application are provided [here](https://github.com/google-coral/test_data), more info
 are provided @ [coral/models](https://coral.ai/models).
 
@@ -72,9 +76,3 @@ $ git submodule init && git submodule update
 $ python3 main.py
 ```
 
-### Demo:
-
-Here you can see the magic of Coral Cam. Observe how one can easily switch between different inference types, models, as
-well as how inference latency increases when the edgetpu is not in use:
-
-<img src="demo.gif" width="1000">
