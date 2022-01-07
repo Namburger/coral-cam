@@ -42,23 +42,13 @@ On the Dev Board, also install chromium:
 $ sudo apt install chromium
 ```
 
-In addition, install all tflite/libedgetpu libraries:
-
-- [libedgetpu](https://coral.ai/docs/accelerator/get-started/#1-install-the-edge-tpu-runtime)
+In addition, install [libedgetpu](https://coral.ai/docs/accelerator/get-started/#1-install-the-edge-tpu-runtime) and [tflite](https://www.tensorflow.org/lite/guide/python):
 
 ```
 $ echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
 $ curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 $ sudo apt-get update
 $ sudo apt-get install libedgetpu1-std
-```
-
-- [tflite_runtime](https://www.tensorflow.org/lite/guide/python)
-
-```
-$ echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | sudo tee /etc/apt/sources.list.d/coral-edgetpu.list
-$ curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-$ sudo apt-get update
 $ sudo apt-get install python3-tflite-runtime
 ```
 
